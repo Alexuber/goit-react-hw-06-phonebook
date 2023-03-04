@@ -1,34 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import { ContactList } from 'components/ContactsList/ContactsList';
 import { Filter } from 'components/Filter/Filter';
-import { nanoid } from 'nanoid';
-import getDataFromLocalStorage from 'shared/utils/localStorage';
+import { useSelector, useDispatch } from 'react-redux';
+import { addNewContact, deleteContact, filterContact } from 'redux/action';
 import styles from './Phonebook.module.scss';
 
-const INITIAL_STATE = {
-  contacts: [],
-  filter: '',
-};
-
 export const Phonebook = () => {
-  const [contacts, setContacts] = useState(() =>
-    getDataFromLocalStorage('contacts', INITIAL_STATE.contacts)
-  );
+  const contacts = useSelector(state => {
+    return state.contacts;
+  });
 
-  const [filter, setFilter] = useState(INITIAL_STATE.filter);
+  const filter = useSelector(state => state.filter);
 
-  const firstRender = useRef(true);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addNewContact = data => {
+  const addContact = data => {
     const { name, number } = data;
     const normalizedNames = contacts.map(contact => contact.name.toLowerCase());
     const allTelephones = contacts.map(contact => contact.number);
@@ -40,14 +26,12 @@ export const Phonebook = () => {
       alert(`${number} already in contacts`);
       return;
     }
-    const newContact = { ...data, id: nanoid(8) };
-    setContacts(prevState => {
-      return [...prevState, newContact];
-    });
+
+    dispatch(addNewContact(data));
   };
 
   const changeFilter = e => {
-    setFilter(e.target.value);
+    dispatch(filterContact(e.target.value));
   };
 
   const getFilteredContacts = () => {
@@ -58,8 +42,8 @@ export const Phonebook = () => {
     );
   };
 
-  const deleteContact = contactId => {
-    setContacts(contacts => contacts.filter(({ id }) => id !== contactId));
+  const removeContact = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
   const filtered = getFilteredContacts();
@@ -67,10 +51,10 @@ export const Phonebook = () => {
   return (
     <section>
       <h1 className={styles.title}>Phonebook</h1>
-      <ContactForm addNewContact={addNewContact} />
+      <ContactForm addNewContact={addContact} />
       <h2 className={styles.contactsTitle}>Contacts</h2>
       <Filter onChangeFilter={changeFilter} value={filter} />
-      <ContactList contacts={filtered} deleteContact={deleteContact} />
+      <ContactList contacts={filtered} deleteContact={removeContact} />
     </section>
   );
 };
