@@ -2,7 +2,9 @@ import { ContactForm } from 'components/ContactForm/ContactForm';
 import { ContactList } from 'components/ContactsList/ContactsList';
 import { Filter } from 'components/Filter/Filter';
 import { useSelector, useDispatch } from 'react-redux';
-import { addNewContact, deleteContact, filterContact } from 'redux/action';
+import { contactFilter } from 'redux/filterSlice';
+import { contactAdd, contactDelete } from 'redux/contactsSlice';
+import { nanoid } from 'nanoid';
 import styles from './Phonebook.module.scss';
 
 export const Phonebook = () => {
@@ -27,11 +29,11 @@ export const Phonebook = () => {
       return;
     }
 
-    dispatch(addNewContact(data));
+    dispatch(contactAdd(data));
   };
 
   const changeFilter = e => {
-    dispatch(filterContact(e.target.value));
+    dispatch(contactFilter(e.target.value));
   };
 
   const getFilteredContacts = () => {
@@ -43,7 +45,7 @@ export const Phonebook = () => {
   };
 
   const removeContact = contactId => {
-    dispatch(deleteContact(contactId));
+    dispatch(contactDelete(contactId));
   };
 
   const filtered = getFilteredContacts();
