@@ -2,17 +2,15 @@ import { ContactForm } from 'components/ContactForm/ContactForm';
 import { ContactList } from 'components/ContactsList/ContactsList';
 import { Filter } from 'components/Filter/Filter';
 import { useSelector, useDispatch } from 'react-redux';
-import { contactFilter } from 'redux/filterSlice';
-import { contactAdd, contactDelete } from 'redux/contactsSlice';
-import { nanoid } from 'nanoid';
+import { contactFilter } from 'components/Phonebook/filterSlice';
+import { contactAdd, contactDelete } from 'components/Phonebook/contactsSlice';
+import { getContacts, getFilter } from 'components/Phonebook/contactsSlice';
 import styles from './Phonebook.module.scss';
 
 export const Phonebook = () => {
-  const contacts = useSelector(state => {
-    return state.contacts;
-  });
+  const contacts = useSelector(getContacts());
 
-  const filter = useSelector(state => state.filter);
+  const filter = useSelector(getFilter());
 
   const dispatch = useDispatch();
 
