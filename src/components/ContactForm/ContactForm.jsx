@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { contactAdd } from 'redux/contacts/contactsSlice';
 import styles from './ContactsForm.module.scss';
 
 const INITIAL_STATE = {
@@ -7,8 +8,26 @@ const INITIAL_STATE = {
   number: '',
 };
 
-export const ContactForm = ({ addNewContact }) => {
+export const ContactForm = () => {
   const [state, setState] = useState({ ...INITIAL_STATE });
+  const contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
+
+  const addContact = data => {
+    const { name, number } = data;
+    const normalizedNames = contacts.map(contact => contact.name.toLowerCase());
+    const allTelephones = contacts.map(contact => contact.number);
+
+    if (normalizedNames.includes(name.toLowerCase())) {
+      alert(`${name} already in contacts`);
+      return;
+    } else if (allTelephones.includes(number)) {
+      alert(`${number} already in contacts`);
+      return;
+    }
+
+    dispatch(contactAdd(data));
+  };
 
   const handleChange = evt => {
     const { name, value } = evt.target;
@@ -18,7 +37,7 @@ export const ContactForm = ({ addNewContact }) => {
 
   const handleFormSubmit = e => {
     e.preventDefault();
-    addNewContact({ ...state });
+    addContact({ ...state });
     reset();
   };
 
@@ -64,8 +83,4 @@ export const ContactForm = ({ addNewContact }) => {
       </button>
     </form>
   );
-};
-
-ContactForm.propTypes = {
-  addNewContact: PropTypes.func.isRequired,
 };
